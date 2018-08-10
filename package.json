@@ -1,6 +1,6 @@
 {
   "name": "memory-card-game",
-  "version": "0.1",
+  "version": "0.0.1",
   "description": "Memory Card Game",
   "main": "src/index.tsx",
   "keywords": [
