@@ -4,9 +4,7 @@ import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import {
     Container
 } from 'reactstrap';
-import Header from './components/Layout/Header';
-import TodoList from './components/TodoList';
-import Readme from './components/Readme';
+import MemoryCardGame from './components/MemoryCardGame';
 
 import './scss/App.scss';
 
@@ -17,13 +15,9 @@ class App extends React.Component<{}> {
     render() {
         return (
             <div className="page-wrapper">
-                <Header title="React Starter" />
-                <Container>
-                    <Switch>
-                        <Route exact path="/" component={TodoList}></Route>
-                        <Route path="/readme" component={Readme}></Route>
-                    </Switch>
-                </Container>
+                <Switch>
+                    <Route path="/" component={MemoryCardGame}></Route>
+                </Switch>
             </div>
         );
     }

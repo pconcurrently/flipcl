@@ -1,0 +1,21 @@
+.card-container {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    background: #282a36;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: all 0.7s ease-in-out;
+
+    .card-backside {
+        background: red;
+        transform: rotateY(180deg);
+        cursor: pointer;
+    }
+}
+
+.flipped, .card-backside {
+    transform: rotateY(180deg);
+}

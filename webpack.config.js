@@ -21,7 +21,8 @@ module.exports = {
         path: path.resolve(__dirname, 'dist')
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".json"]
+        extensions: [".ts", ".tsx", ".js", ".json"],
+        alias: { soundmanager2: 'soundmanager2/script/soundmanager2-nodebug-jsmin.js' }
     },
     module: {
         rules: [

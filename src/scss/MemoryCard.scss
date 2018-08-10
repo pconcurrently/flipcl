@@ -1,0 +1,19 @@
+h1.title {
+    font-family: 'Monoton';
+    text-align: center;
+
+}
+.main-board {
+    width: 100vw;
+    height: 100vw;
+    // min-width: ;
+    // min-height: ;
+    background-color: $carbon;
+    border-radius: 4px;
+    box-shadow: 3px 5px 5px 0 rgba(0, 0, 0, 0.3);
+
+    @include respond-to ($xlarge-up) {
+        width: 800px;
+        height: 800px;
+    }
+}
