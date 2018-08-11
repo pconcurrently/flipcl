@@ -1,7 +1,7 @@
 {
-  "name": "memory-card-game",
-  "version": "0.0.1",
-  "description": "Memory Card Game",
+  "name": "flipcl",
+  "version": "0.1.0",
+  "description": "FlipCL - A Memory Card Game",
   "main": "src/index.tsx",
   "keywords": [
     "react",
@@ -11,24 +11,26 @@
     "redux-thunk",
     "sass",
     "postcss",
-    "memory-card-game"
+    "flipcl"
   ],
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack --config webpack.dev.js",
+    "deploy": "npm run build && gsutil -m cp -r dist/* gs://flipcl.phohuynh.com",
+    "deploy:clean": "npm run build && gsutil rm gs://flipcl.phohuynh.com/* && gsutil -m cp -r dist/* gs://flipcl.phohuynh.com",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:shortgiraffe4/memory-card-game.git"
+    "url": "git@github.com:shortgiraffe4/flipcl.git"
   },
   "author": "https://github.com/shortgiraffe4/",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shortgiraffe4/memory-card-game/issues"
+    "url": "https://github.com/shortgiraffe4/flipcl/issues"
   },
-  "homepage": "https://github.com/shortgiraffe4/memory-card-game",
+  "homepage": "https://github.com/shortgiraffe4/flipcl",
   "browserslist": [
     "> 1%",
     "last 2 versions",
