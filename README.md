@@ -1,4 +1,4 @@
-# FlipCL - Memory Card Game
+# FlipCL - A Memory Card Game
 
 [![Build Status](https://travis-ci.org/shortgiraffe4/flipcl.svg?branch=master)](https://travis-ci.org/shortgiraffe4/flipcl)
 [![Dependency Status](https://david-dm.org/shortgiraffe4/flipcl.svg)](https://david-dm.org/shortgiraffe4/flipcl)
