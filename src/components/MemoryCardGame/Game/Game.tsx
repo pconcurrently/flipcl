@@ -87,8 +87,8 @@ class Game extends React.Component<GameProps, GameState> {
 
     componentWillMount() {
         const { iconsPerRow } = this.props;
-        // const collection = generateIconsCollection('FA', iconsPerRow * iconsPerRow / 2);
-        const collection = generateIconsCollection('FA', 2);
+        const collection = generateIconsCollection('FA', iconsPerRow * iconsPerRow / 2);
+        // const collection = generateIconsCollection('FA', 2);
         const collectionMapping = collection.map(item => ({
             Icon: item[Object.keys(item)[0]],
             name: Object.keys(item)[0],
