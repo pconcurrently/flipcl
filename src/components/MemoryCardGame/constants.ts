@@ -2,7 +2,8 @@ export const STAGES = {
     MENU: 1,
     HELP: 2,
     HIGH_SCORES: 3,
-    PLAY: 4
+    PLAY: 4,
+    SCORE: 5
 };
 
 export const DIFFICULTIES: any = {

@@ -3,6 +3,8 @@ import * as React from 'react';
 import Menu from './Menu';
 import Game from './Game';
 import Sound from './Sound';
+import Score from './Score';
+import Counter from './Counter';
 
 import { STAGES, DIFFICULTIES, PLAY_STATUS, BOARD_SIZES, ICONS_PER_ROW } from './constants';
 
@@ -13,7 +15,8 @@ interface MemoryCardState {
     stage: number,
     playingPosition: number,
     boardSize: number,
-    iconsPerRow: number
+    iconsPerRow: number,
+    counter: string,
 }
 
 const calculateBoardSize = (): number => {
@@ -48,12 +51,17 @@ const initialState = {
     stage: STAGES.MENU,
     playingPosition: 3000,
     boardSize: calculateBoardSize(),
-    iconsPerRow: 10
+    iconsPerRow: 10,
+    counter: '00:00:00',
 }
 
+let interval: any;
 class MemoryCard extends React.Component<{}, MemoryCardState> {
+    private counter: any;
     constructor(props: any) {
         super(props);
+
+        this.counter = React.createRef();
 
         if (typeof window !== undefined && (window as any).soundManager) {
             (window as any).soundManager.setup({ debugMode: false });
@@ -64,27 +72,11 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         this.chooseLevel = this.chooseLevel.bind(this);
         this.updateBoardSize = this.updateBoardSize.bind(this);
         this.goToStage = this.goToStage.bind(this);
+        this.goToMenu = this.goToMenu.bind(this);
+        this.onFinish = this.onFinish.bind(this);
     }
 
-    chooseLevel(level: string) {
-        const transformedLevel = DIFFICULTIES[level];
-        this.setState({
-            level: transformedLevel,
-            stage: STAGES.PLAY,
-            iconsPerRow: ICONS_PER_ROW[transformedLevel]
-        })
-    }
-
-    updateBoardSize() {
-        // this.setState({
-        //     boardSize: calculateBoardSize(),
-        // });
-    }
-
-    goToStage(stage: number) {
-        this.setState({
-            ...initialState
-        });
+    componentWillMount() {
     }
 
     componentDidMount() {
@@ -95,29 +87,71 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         window.removeEventListener('resize', this.updateBoardSize);
     }
 
+    chooseLevel(level: string) {
+        const transformedLevel = DIFFICULTIES[level];
+        this.setState({
+            level: transformedLevel,
+            stage: STAGES.PLAY,
+            iconsPerRow: ICONS_PER_ROW[transformedLevel]
+        });        
+    }
+
+    updateBoardSize() {
+        // this.setState({
+        //     boardSize: calculateBoardSize(),
+        // });
+    }
+
+    goToStage(stage: number) {
+        this.setState({
+            stage
+        });
+    }
+
+    goToMenu() {
+        this.setState({
+            ...initialState
+        });
+    }
+
+    onFinish(startTime: any, endTime: any) {
+        console.log(startTime, endTime);
+        this.setState({
+            stage: STAGES.SCORE
+        });
+    }
+
     render() {
-        const { stage, playingPosition, boardSize, iconsPerRow } = this.state;
+        const { stage, playingPosition, boardSize, iconsPerRow, counter } = this.state;
         const actualBoardSize = boardSize * iconsPerRow / ICONS_PER_ROW[DIFFICULTIES.VERY_HARD];
         return (
             <div className="game-container">
-                <h1 className="title">Memory Card Game</h1>
+                <h1 className="title">FLIPCL</h1>
                 {/* <Sound
                     url="assets/audio/adamant_opinion.mp3"
                     playStatus={PLAY_STATUS.PLAYING}
                     playFromPosition={playingPosition}
                     loop
                 /> */}
-                <div className="main-board" style={{ width: boardSize, height: boardSize }}>
+                <div className="main-board" style={{ width: boardSize, height: boardSize + 100 }}>
                     <div className="actual-board" style={{ width: actualBoardSize, height: actualBoardSize }}>
                         {stage === STAGES.MENU ? (
                             <Menu chooseLevel={this.chooseLevel} />
                         ) : null}
                         {stage === STAGES.PLAY ? (
-                            <Game iconsPerRow={iconsPerRow} boardSize={actualBoardSize} />
+                            <Game 
+                                iconsPerRow={iconsPerRow} 
+                                boardSize={actualBoardSize + iconsPerRow * 8} 
+                                onFinish={this.onFinish}
+                            />
                         ) : null}
+                        {stage === STAGES.SCORE ? <Score /> : null}
+                    </div>
+                    <div className="home-button-wrapper">
+                        {stage === STAGES.PLAY ?  <Counter ref={this.counter} /> : null}
+                        {stage !== STAGES.MENU ? <button className="gaming-button home-button" onClick={this.goToMenu}>Back To Menu</button> : null}
                     </div>
                 </div>
-                {stage !== STAGES.MENU ? <button className="gaming-button" onClick={() => this.goToStage(STAGES.MENU)}>BackTo Menu</button> : null}
             </div>
         );
     }
