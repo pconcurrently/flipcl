@@ -40,7 +40,7 @@ const calculateBoardSize = (): number => {
     } else if (innerWidth >= 576) {
         rtnSize = BOARD_SIZES.SM;
     } else {
-        rtnSize = BOARD_SIZES.XS;
+        rtnSize = innerWidth;
     }
 
     return rtnSize;
@@ -127,12 +127,12 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         return (
             <div className="game-container">
                 <h1 className="title">FLIPCL</h1>
-                {/* <Sound
+                <Sound
                     url="assets/audio/adamant_opinion.mp3"
                     playStatus={PLAY_STATUS.PLAYING}
                     playFromPosition={playingPosition}
                     loop
-                /> */}
+                />
                 <div className="main-board" style={{ width: boardSize, height: boardSize + 100 }}>
                     <div className="actual-board" style={{ width: actualBoardSize, height: actualBoardSize }}>
                         {stage === STAGES.MENU ? (
