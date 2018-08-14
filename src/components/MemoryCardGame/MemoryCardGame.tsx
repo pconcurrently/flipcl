@@ -150,13 +150,13 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         return (
             <div className="game-container">
                 <h1 className="title">FLIPCL</h1>
-                {/* <Sound
+                <Sound
                     url="assets/audio/adamant_opinion.mp3"
                     playStatus={PLAY_STATUS.PLAYING}
                     playFromPosition={playingPosition}
                     loop
                     volume={50}
-                /> */}
+                />
                 <div className="main-board" style={{ width: boardSize }}>
                     <div className="actual-board" style={{ width: actualBoardSize, height: actualBoardSize }}>
                         {stage === STAGES.MENU ? (
