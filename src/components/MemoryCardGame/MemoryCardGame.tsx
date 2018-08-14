@@ -1,4 +1,7 @@
 import * as React from 'react';
+import {
+    Modal, ModalHeader, ModalBody, ModalFooter, Button
+} from 'reactstrap';
 
 import Menu from './Menu';
 import Game from './Game';
@@ -17,6 +20,9 @@ interface MemoryCardState {
     boardSize: number,
     iconsPerRow: number,
     counter: string,
+    startTime?: any,
+    endTime?: any,
+    isModalOpen: boolean,
 }
 
 const calculateBoardSize = (): number => {
@@ -53,11 +59,13 @@ const initialState = {
     boardSize: calculateBoardSize(),
     iconsPerRow: 10,
     counter: '00:00:00',
+    isModalOpen: false
 }
 
 let interval: any;
 class MemoryCard extends React.Component<{}, MemoryCardState> {
     private counter: any;
+    private modalTimer: any;
     constructor(props: any) {
         super(props);
 
@@ -74,9 +82,7 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         this.goToStage = this.goToStage.bind(this);
         this.goToMenu = this.goToMenu.bind(this);
         this.onFinish = this.onFinish.bind(this);
-    }
-
-    componentWillMount() {
+        this.toggleModal = this.toggleModal.bind(this);
     }
 
     componentDidMount() {
@@ -97,9 +103,18 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
     }
 
     updateBoardSize() {
-        // this.setState({
-        //     boardSize: calculateBoardSize(),
-        // });
+        if (this.modalTimer) {
+            clearTimeout(this.modalTimer);
+        }
+        this.modalTimer = setTimeout(() => this.setState({
+            isModalOpen: true,
+        }), 200);
+    }
+
+    reloadPage() {
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     }
 
     goToStage(stage: number) {
@@ -115,25 +130,34 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
     }
 
     onFinish(startTime: any, endTime: any) {
-        console.log(startTime, endTime);
         this.setState({
-            stage: STAGES.SCORE
+            stage: STAGES.SCORE,
+            startTime,
+            endTime
+        });
+    }
+
+    toggleModal() {
+        const isModalOpen = this.state;
+        this.setState({
+            isModalOpen: !isModalOpen
         });
     }
 
     render() {
-        const { stage, playingPosition, boardSize, iconsPerRow, counter } = this.state;
+        const { stage, playingPosition, boardSize, iconsPerRow, startTime, endTime } = this.state;
         const actualBoardSize = boardSize * iconsPerRow / ICONS_PER_ROW[DIFFICULTIES.VERY_HARD];
         return (
             <div className="game-container">
                 <h1 className="title">FLIPCL</h1>
-                <Sound
+                {/* <Sound
                     url="assets/audio/adamant_opinion.mp3"
                     playStatus={PLAY_STATUS.PLAYING}
                     playFromPosition={playingPosition}
                     loop
-                />
-                <div className="main-board" style={{ width: boardSize, height: boardSize + 100 }}>
+                    volume={50}
+                /> */}
+                <div className="main-board" style={{ width: boardSize }}>
                     <div className="actual-board" style={{ width: actualBoardSize, height: actualBoardSize }}>
                         {stage === STAGES.MENU ? (
                             <Menu chooseLevel={this.chooseLevel} />
@@ -145,13 +169,21 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
                                 onFinish={this.onFinish}
                             />
                         ) : null}
-                        {stage === STAGES.SCORE ? <Score /> : null}
+                        {stage === STAGES.SCORE ? <Score startTime={startTime} endTime={endTime} /> : null}
                     </div>
                     <div className="home-button-wrapper">
                         {stage === STAGES.PLAY ?  <Counter ref={this.counter} /> : null}
                         {stage !== STAGES.MENU ? <button className="gaming-button home-button" onClick={this.goToMenu}>Back To Menu</button> : null}
                     </div>
                 </div>
+                <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+                    <ModalBody>
+                        Resolution changed. Please reload to continue playing!
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary" onClick={this.reloadPage}>Reload</Button>
+                    </ModalFooter>
+                </Modal>
             </div>
         );
     }

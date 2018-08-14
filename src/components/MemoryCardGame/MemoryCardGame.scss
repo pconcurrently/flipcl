@@ -36,10 +36,11 @@ h1.title {
 
 .home-button-wrapper {
     display: grid;
-    align-items: self-end;
     text-align: center;
     justify-items: center;
+    align-content: flex-end;
     padding: 15px;
+    background-color: $carbon;
 }
 
 button.gaming-button {

@@ -12,6 +12,19 @@ class App extends React.Component<{}> {
     constructor(props: any) {
         super(props);
     }
+
+    componentWillMount() {
+        document.addEventListener('contextmenu', this._handleContextMenu);
+    }
+    componentWillUnmount() {
+        document.removeEventListener('contextmenu', this._handleContextMenu);
+    }
+
+    _handleContextMenu(e: any) {
+        e.preventDefault();
+        return false;
+    }
+
     render() {
         return (
             <div className="page-wrapper">

@@ -6,21 +6,36 @@ import { IconType } from 'react-icons/lib';
 import Card from '../Card';
 
 import {
+    FaQuora, FaReact, FaReddit, FaRocketchat, FaSafari, FaSass, FaShip, FaTablet, FaTelegram, FaTaxi, FaUber,
     FaBeer, FaBed, FaBandcamp, FaCalculator, FaCamera, FaCartPlus, FaDice, FaDiscord, FaDocker, FaDigitalOcean ,
     FaDeviantart, FaEmpire, FaEnvelope, FaEmber, FaFacebook, FaFeather, FaFighterJet, FaGamepad, FaGem, FaHeadphones, 
     FaHashtag, FaJava, FaJs, FaKeycdn, FaKiwiBird, FaLaptop, FaLastfm, FaMars, FaMedium, FaNodeJs, 
     FaNpm, FaNewspaper, FaNintendoSwitch, FaOpera, FaOpenid, FaPatreon, FaPaypal, FaPalette, FaQrcode, 
-    FaQuora, FaReact, FaReddit, FaRocketchat, FaSafari, FaSass, FaShip, FaTablet, FaTelegram, FaTaxi, FaUber,
 } from 'react-icons/fa';
 import {
-    IoIosAirplane
+    IoIosAirplane, IoIosAppstore, IoIosBaseball, IoIosAlert, IoIosBatteryFull, IoIosApps, IoIosBluetooth, IoIosBoat, IoIosBonfire, IoIosBed, 
+    IoIosCafe, IoIosCar, IoIosCellular, IoIosCash, IoIosClipboard, IoIosDisc, IoIosCart, IoIosChatbubbles, IoIosCall, IoIosCloud, 
+    IoIosEgg, IoIosExit, IoIosFastforward, IoIosFlag, IoIosFlash, IoIosFlame, IoIosFootball, IoIosFitness, IoIosGlobe, IoIosGift, 
+    IoIosHammer, IoIosHeadset, IoIosHeartDislike, IoIosHourglass, IoIosHelpBuoy, IoIosIceCream, IoIosInfinite, IoIosImages, IoIosJet, IoIosJournal, 
+    IoIosLaptop, IoIosLeaf, IoIosLink, IoIosLocate, IoIosLock, IoIosMagnet, IoIosMail, IoIosMap, IoIosMegaphone, IoIosNotifications, 
 } from 'react-icons/io';
+import { 
+    FiActivity, FiAirplay, FiAlertOctagon, FiAperture, FiAward, FiBattery, FiBell, FiBook, FiBluetooth, FiBox,
+    FiCast, FiCheckCircle, FiChrome, FiCodepen, FiCompass, FiCloudRain, FiCpu, FiDatabase, FiDollarSign, FiDroplet,
+    FiEye, FiFacebook, FiFeather, FiFilm, FiFlag, FiGithub, FiGitlab, FiGlobe, FiGrid, FiHardDrive,
+    FiHeadphones, FiHeart, FiInbox, FiInstagram, FiLayers, FiLinkedin, FiLoader, FiLock, FiMail, FiMapPin,
+    FiMonitor, FiMoon, FiMusic, FiPackage, FiPhone, FiPlayCircle, FiPower, FiSend, FiShield, FiShoppingCart,
+} from 'react-icons/fi';
 
 interface CollectionItem {
     Icon: IconType,
     name: string,
     isFlipped?: boolean,
     isSolved?: boolean,
+}
+interface FlippingItem {
+    name: string,
+    index: number
 }
 
 interface SetIcon {
@@ -29,9 +44,9 @@ interface SetIcon {
 
 interface GameState {
     collection: CollectionItem[],
-    currentOpen?: { index: number, name: string },
     startTime?: any,
     endTime?: any,
+    flipping: FlippingItem[],
 };
 interface GameProps {
     iconsPerRow: number,
@@ -43,16 +58,26 @@ import './Game.scss';
 
 const SETS: {[set: string]: SetIcon[]} = {
     FA: [ 
+        { FaReact }, { FaReddit }, { FaRocketchat }, { FaSafari }, { FaSass }, { FaShip }, { FaTablet }, { FaTelegram }, { FaTaxi }, { FaUber },
         { FaBeer }, { FaBed }, { FaBandcamp }, { FaCalculator }, { FaCamera }, { FaCartPlus }, { FaDice }, { FaDiscord }, { FaDocker }, { FaDigitalOcean }, 
         { FaDeviantart }, { FaEmpire }, { FaEnvelope }, { FaEmber }, { FaFacebook }, { FaFeather }, { FaFighterJet }, { FaGamepad }, { FaGem }, { FaHeadphones }, 
         { FaHashtag }, { FaJava }, { FaJs }, { FaKeycdn }, { FaKiwiBird }, { FaLaptop }, { FaLastfm }, { FaMars }, { FaMedium }, { FaNodeJs }, 
         { FaNpm }, { FaNewspaper }, { FaNintendoSwitch }, { FaOpera }, { FaOpenid }, { FaPatreon }, { FaPaypal }, { FaPalette }, { FaQrcode }, { FaQuora },
-        { FaReact }, { FaReddit }, { FaRocketchat }, { FaSafari }, { FaSass }, { FaShip }, { FaTablet }, { FaTelegram }, { FaTaxi }, { FaUber }
     ],
     IO: [
-        { IoIosAirplane } ,
+        { IoIosAirplane }, { IoIosAppstore }, { IoIosBaseball }, { IoIosAlert }, { IoIosBatteryFull }, { IoIosApps }, { IoIosBluetooth }, { IoIosBoat }, { IoIosBonfire }, { IoIosBed },
+        { IoIosCafe }, { IoIosCar }, { IoIosCellular }, { IoIosCash }, { IoIosClipboard }, { IoIosDisc }, { IoIosCart }, { IoIosChatbubbles }, { IoIosCall }, { IoIosCloud },
+        { IoIosEgg }, { IoIosExit }, { IoIosFastforward }, { IoIosFlag }, { IoIosFlash }, { IoIosFlame }, { IoIosFootball }, { IoIosFitness }, { IoIosGlobe }, { IoIosGift },
+        { IoIosHammer }, { IoIosHeadset }, { IoIosHeartDislike }, { IoIosHourglass }, { IoIosHelpBuoy }, { IoIosIceCream }, { IoIosInfinite }, { IoIosImages }, { IoIosJet }, { IoIosJournal },
+        { IoIosLaptop }, { IoIosLeaf }, { IoIosLink }, { IoIosLocate }, { IoIosLock }, { IoIosMagnet }, { IoIosMail }, { IoIosMap }, { IoIosMegaphone }, { IoIosNotifications },
     ],
-    // MD: [ FaBeer, FaBed, FaBandcamp, FaCalculator, FaCalendar, FaCamera, FaCartPlus, FaDice, FaDiscord, FaDocker ],
+    FI: [
+        { FiActivity }, { FiAirplay }, { FiAlertOctagon }, { FiAperture }, { FiAward }, { FiBattery }, { FiBell }, { FiBook }, { FiBluetooth }, { FiBox },
+        { FiCast }, { FiCheckCircle }, { FiChrome }, { FiCodepen }, { FiCompass }, { FiCloudRain }, { FiCpu }, { FiDatabase }, { FiDollarSign }, { FiDroplet },
+        { FiEye }, { FiFacebook }, { FiFeather }, { FiFilm }, { FiFlag }, { FiGithub }, { FiGitlab }, { FiGlobe }, { FiGrid }, { FiHardDrive },
+        { FiHeadphones }, { FiHeart }, { FiInbox }, { FiInstagram }, { FiLayers }, { FiLinkedin }, { FiLoader }, { FiLock }, { FiMail }, { FiMapPin },
+        { FiMonitor }, { FiMoon }, { FiMusic }, { FiPackage }, { FiPhone }, { FiPlayCircle }, { FiPower }, { FiSend }, { FiShield }, { FiShoppingCart },
+    ],
 }
 
 const randomizeSet = (): string => {
@@ -80,6 +105,7 @@ class Game extends React.Component<GameProps, GameState> {
 
         this.state = {
             collection: [],
+            flipping: [],
         };
 
         this.flipCard == this.flipCard.bind(this);
@@ -87,8 +113,7 @@ class Game extends React.Component<GameProps, GameState> {
 
     componentWillMount() {
         const { iconsPerRow } = this.props;
-        const collection = generateIconsCollection('FA', iconsPerRow * iconsPerRow / 2);
-        // const collection = generateIconsCollection('FA', 2);
+        const collection = generateIconsCollection(randomizeSet(), iconsPerRow * iconsPerRow / 2);
         const collectionMapping = collection.map(item => ({
             Icon: item[Object.keys(item)[0]],
             name: Object.keys(item)[0],
@@ -102,44 +127,50 @@ class Game extends React.Component<GameProps, GameState> {
     }
 
     flipCard(index: number) {
-        const { collection, currentOpen } = this.state;
+        const { collection, flipping } = this.state;
+
         if (collection[index] && !collection[index].isSolved) {
-            collection[index].isFlipped = true;
-            this.setState({
-                collection,
-            });
-            setTimeout(() => {
-                if (currentOpen) {
-                    if (currentOpen.name === collection[index].name) {
-                        collection[index].isSolved = true;
-                        collection[currentOpen.index].isSolved = true;
-                        setTimeout(() => {
-                            this.setState({
-                                collection,
-                                currentOpen: null
-                            });
-                            const won = collection.every(item => item.isSolved);
-                            if (won) {
-                                const endTime = moment();
-                                this.props.onFinish(this.state.startTime, endTime);
-                            }
-                        }, 400);
-                    } else {
-                        collection[index].isFlipped = false;
-                        collection[currentOpen.index].isFlipped = false;
-                        setTimeout(() => this.setState({
-                            collection,
-                            currentOpen: null
-                        }), 400);
-                    }
-                } else {
-                    collection[index].isFlipped = true;
+            if (flipping.length === 1) {
+                collection[index].isFlipped = true;
+                flipping.push({ name: collection[index].name, index });
+                this.setState({
+                    collection,
+                    flipping
+                });
+
+                if (flipping[0].name === flipping[1].name) {
+                    collection[flipping[0].index].isSolved = true;
+                    collection[flipping[1].index].isSolved = true;
                     this.setState({
                         collection,
-                        currentOpen: { index, name: collection[index].name }
+                        flipping: []
                     });
+                    const won = collection.every(item => item.isSolved);
+                    if (won) {
+                        const endTime = moment();
+                        setTimeout(() => this.props.onFinish(this.state.startTime, endTime), 1000);
+                    }
+                } else {
+                    setTimeout(() => {
+                        collection[flipping[0].index].isFlipped = false;
+                        collection[flipping[1].index].isFlipped = false;
+                        this.setState({
+                            collection,
+                            flipping: []
+                        });
+                    }, 500)
+                    
                 }
-            }, 200)
+            } else if (flipping.length === 0) {
+                collection[index].isFlipped = true;
+                flipping.push({ name: collection[index].name, index });
+                this.setState({
+                    collection,
+                    flipping
+                });
+            }
+
+
         }
     }
 
