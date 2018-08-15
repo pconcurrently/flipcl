@@ -40,7 +40,10 @@ h1.title {
     justify-items: center;
     align-content: flex-end;
     padding: 15px;
-    background-color: $carbon;
+    background-color: transparent;
+    transition: all 0.1s linear;
+    min-height: 130px;
+    width: 100%;
 }
 
 button.gaming-button {
@@ -54,7 +57,7 @@ button.gaming-button {
     text-transform: uppercase;
     font-family: Roboto;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 13px;
     cursor: pointer;
     user-select: none;
     // height: ;
@@ -69,10 +72,18 @@ button.gaming-button {
         outline: none;
         box-shadow: 1px 1px 1px #ff5f56;
     }
+        
+    @include respond-to($medium-up) {
+        font-size: 18px;
+    }
 }
 
 button.gaming-button.home-button {
     width: 250px;
-    height: 54px;
+    height: 37px;
     max-width: 50%;
+
+    @include respond-to($medium-up) {
+        height: 54px;
+    }
 }

@@ -1,7 +1,14 @@
 import * as React from 'react';
 import {
-    Modal, ModalHeader, ModalBody, ModalFooter, Button
+    Modal, ModalBody, ModalFooter, Button
 } from 'reactstrap';
+import axios from 'axios';
+import firebase from '../../firebase';
+
+import * as moment from 'moment';
+
+const momentDurationFormatSetup = require("moment-duration-format");
+momentDurationFormatSetup(moment)
 
 import Menu from './Menu';
 import Game from './Game';
@@ -23,6 +30,10 @@ interface MemoryCardState {
     startTime?: any,
     endTime?: any,
     isModalOpen: boolean,
+    playingStatus: string,
+    userIp: string,
+    duration?: string,
+    highscores?: any,
 }
 
 const calculateBoardSize = (): number => {
@@ -59,17 +70,20 @@ const initialState = {
     boardSize: calculateBoardSize(),
     iconsPerRow: 10,
     counter: '00:00:00',
-    isModalOpen: false
+    isModalOpen: false,
+    playingStatus: PLAY_STATUS.STOPPED,
+    userIp: '',
 }
 
 let interval: any;
 class MemoryCard extends React.Component<{}, MemoryCardState> {
-    private counter: any;
+    private userIp: any;
     private modalTimer: any;
+    private firebaseRef: any;
+    private firebaseCallback: any;
+    private highscores: any;
     constructor(props: any) {
         super(props);
-
-        this.counter = React.createRef();
 
         if (typeof window !== undefined && (window as any).soundManager) {
             (window as any).soundManager.setup({ debugMode: false });
@@ -85,8 +99,24 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         this.toggleModal = this.toggleModal.bind(this);
     }
 
+    componentWillMount() {
+        axios.get('https://geoip-db.com/jsonp/')
+            .then(res => {
+                if (res.status === 200) {
+                    const data = JSON.parse(res.data.replace(/^callback\(|\)\;/g, '').replace(')', ''));
+                    this.userIp = data.IPv4;
+                }
+            })
+            .catch(error => {
+            });
+    }
+
     componentDidMount() {
         window.addEventListener("resize", this.updateBoardSize);
+        this.firebaseRef = firebase.database().ref('/highscores');
+        this.firebaseCallback = this.firebaseRef.on('value', (snap: any) => {
+            this.highscores = snap.val();
+        });
     }
 
     componentWillUnmount() {
@@ -98,7 +128,8 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
         this.setState({
             level: transformedLevel,
             stage: STAGES.PLAY,
-            iconsPerRow: ICONS_PER_ROW[transformedLevel]
+            iconsPerRow: ICONS_PER_ROW[transformedLevel],
+            playingStatus: PLAY_STATUS.PLAYING,
         });        
     }
 
@@ -130,10 +161,21 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
     }
 
     onFinish(startTime: any, endTime: any) {
+        const { level } = this.state;
+        const ip = this.userIp.replace(/\./g, '_');
+        const duration = moment.duration(endTime.diff(startTime));
+        const durationAsSeconds = (duration as any).format();
+        const userHighScore = this.highscores[ip][level];
+        if (Math.ceil(duration.asSeconds()) < userHighScore) {
+            this.firebaseRef.update({
+                [ip]: {
+                    [level]: Math.ceil(duration.asSeconds())
+                },
+            });
+        }
         this.setState({
             stage: STAGES.SCORE,
-            startTime,
-            endTime
+            duration: durationAsSeconds,
         });
     }
 
@@ -145,14 +187,14 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
     }
 
     render() {
-        const { stage, playingPosition, boardSize, iconsPerRow, startTime, endTime } = this.state;
+        const { stage, playingPosition, boardSize, iconsPerRow, duration, playingStatus } = this.state;
         const actualBoardSize = boardSize * iconsPerRow / ICONS_PER_ROW[DIFFICULTIES.VERY_HARD];
         return (
             <div className="game-container">
                 <h1 className="title">FLIPCL</h1>
                 <Sound
                     url="assets/audio/adamant_opinion.mp3"
-                    playStatus={PLAY_STATUS.PLAYING}
+                    playStatus={playingStatus}
                     playFromPosition={playingPosition}
                     loop
                     volume={50}
@@ -169,12 +211,12 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
                                 onFinish={this.onFinish}
                             />
                         ) : null}
-                        {stage === STAGES.SCORE ? <Score startTime={startTime} endTime={endTime} /> : null}
+                        {stage === STAGES.SCORE ? <Score duration={duration} /> : null}
                     </div>
-                    <div className="home-button-wrapper">
-                        {stage === STAGES.PLAY ?  <Counter ref={this.counter} /> : null}
-                        {stage !== STAGES.MENU ? <button className="gaming-button home-button" onClick={this.goToMenu}>Back To Menu</button> : null}
-                    </div>
+                </div>
+                <div className="home-button-wrapper">
+                    {stage === STAGES.PLAY ? <Counter /> : null}
+                    {stage !== STAGES.MENU ? <button className="gaming-button home-button" onClick={this.goToMenu}>Back To Menu</button> : null}
                 </div>
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalBody>
