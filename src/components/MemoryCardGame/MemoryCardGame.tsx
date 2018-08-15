@@ -156,7 +156,8 @@ class MemoryCard extends React.Component<{}, MemoryCardState> {
 
     goToMenu() {
         this.setState({
-            ...initialState
+            ...initialState,
+            playingStatus: PLAY_STATUS.PLAYING
         });
     }
 
